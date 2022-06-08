@@ -1,46 +1,84 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_itoa.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hmechich <hmechich@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/11/25 09:11:44 by hmechich          #+#    #+#             */
+/*   Updated: 2022/01/15 18:39:48 by hmechich         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 
-static int ft_abs(int nbr)
+static char	spe_putnbr(int nb)
 {
-	return ((nbr < 0) ? -nbr : nbr);
-}
+	unsigned int	number;
 
-static void ft_strrev(char *str)
-{
-	size_t	length;
-	size_t	i;
-	char	tmp;
-
-	length = ft_strlen(str);
-	i = 0;
-	while (i < length / 2)
+	number = nb;
+	if (number == 0)
+		return (0 + '0');
+	if (number > 0)
 	{
-		tmp = str[i];
-		str[i] = str[length - i - 1];
-		str[length - i - 1] = tmp;
-		i++;
+		spe_putnbr(number / 10);
+		number %= 10;
 	}
+	return (number + '0');
 }
 
-char *ft_itoa(int n)
+static int	is_neg(int nb)
 {
-	char	*str;
-	int		is_neg;
-	size_t	length;
+	if (nb < 0)
+		return (1);
+	return (0);
+}
 
-	is_neg = (n < 0);
-	if (!(str = ft_calloc(11 + is_neg, sizeof(*str))))
+static size_t	get_len(int n)
+{
+	size_t			len;
+	unsigned int	number;
+
+	len = 0;
+	if (is_neg(n))
+	{
+		number = (unsigned int)-n;
+		len++;
+	}
+	else
+		number = (unsigned int)n;
+	while (number > 9)
+	{
+		number /= 10;
+		len++;
+	}
+	len++;
+	return (len);
+}
+
+char	*ft_itoa(int n)
+{
+	char			*result;
+	size_t			len;
+	unsigned int	num;
+	int				i;
+
+	len = get_len(n);
+	result = malloc(sizeof(char) * (len + 1));
+	if (result == NULL)
 		return (NULL);
-	if (n == 0)
-		str[0] = '0';
-	length = 0;
-	while (n != 0)
+	i = 0;
+	if (is_neg(n))
+		num = (unsigned int)-n;
+	else
+		num = (unsigned int)n;
+	while (i++ <= (int)len - 1)
 	{
-		str[length++] = '0' + ft_abs(n % 10);
-		n = (n / 10);
+		result[(int)len - i] = spe_putnbr(num);
+		num /= 10;
 	}
-	if (is_neg)
-		str[length] = '-';
-	ft_strrev(str);
-	return (str);
+	if (is_neg(n))
+		result[0] = '-';
+	result[len] = '\0';
+	return (result);
 }
